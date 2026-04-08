@@ -1,0 +1,39 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.Master.cs" Inherits="RiverdalePermitSystem.Web.MasterPages.SiteMaster" %>
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Riverdale City - Building Permit System</title>
+    <link href="../Styles/Site.css" rel="stylesheet" type="text/css" />
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePartialRendering="true" />
+        <div class="header">
+            <h1>Riverdale City Council - Building Permit System</h1>
+            <div class="user-info">
+                Welcome, <asp:Label ID="lblUserName" runat="server" /> 
+                | Role: <asp:Label ID="lblUserRole" runat="server" />
+                | <asp:LinkButton ID="lnkLogout" runat="server" OnClick="lnkLogout_Click">Logout</asp:LinkButton>
+            </div>
+        </div>
+        <div class="navigation">
+            <asp:HyperLink ID="lnkHome" runat="server" NavigateUrl="~/Default.aspx">Home</asp:HyperLink>
+            <asp:HyperLink ID="lnkApply" runat="server" NavigateUrl="~/Pages/PermitApplication.aspx">Apply for Permit</asp:HyperLink>
+            <asp:HyperLink ID="lnkSearch" runat="server" NavigateUrl="~/Pages/PermitSearch.aspx">Search Permits</asp:HyperLink>
+            <asp:HyperLink ID="lnkInspections" runat="server" NavigateUrl="~/Pages/InspectionSchedule.aspx">Schedule Inspection</asp:HyperLink>
+            <asp:HyperLink ID="lnkReview" runat="server" NavigateUrl="~/Pages/PlanReview.aspx">Plan Review</asp:HyperLink>
+            <asp:HyperLink ID="lnkDashboard" runat="server" NavigateUrl="~/Pages/Dashboard.aspx">Dashboard</asp:HyperLink>
+        </div>
+        <div class="content">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server">
+            </asp:ContentPlaceHolder>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 Riverdale City Council. All rights reserved. | Contact: permits@riverdalecity.gov | Phone: (555) 123-4567</p>
+        </div>
+    </form>
+</body>
+</html>
