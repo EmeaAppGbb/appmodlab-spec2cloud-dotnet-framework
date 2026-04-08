@@ -1,0 +1,22 @@
+## ASP.NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+.vs/
+.vscode/
+
+## Web Forms
+App_Data/
+*.mdf
+*.ldf
+
+## Spec2Cloud
+specs/
+*.spec.json
+
+## Windows
+Thumbs.db
+Desktop.ini
