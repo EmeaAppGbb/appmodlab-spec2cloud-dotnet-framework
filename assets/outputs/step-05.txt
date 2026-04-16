@@ -1,0 +1,95 @@
+ÔùÅ List directory assets\outputs
+  Ôöö 8 files found
+
+ÔùÅ Read step-04-component-specs.md
+  Ôöé assets\outputs\step-04-component-specs.md
+  Ôöö 1 line read
+
+ÔùÅ Read step-03-architecture-spec.md
+  Ôöé assets\outputs\step-03-architecture-spec.md
+  Ôöö 1 line read
+
+Both files are large. Let me read them in sections to understand the full architecture.
+
+ÔùÅ Read step-03-architecture-spec.md
+  Ôöé assets\outputs\step-03-architecture-spec.md
+  Ôöö L121:250 (129 lines read)
+
+ÔùÅ Read step-03-architecture-spec.md
+  Ôöé assets\outputs\step-03-architecture-spec.md
+  Ôöö L251:400 (150 lines read)
+
+ÔùÅ Read step-03-architecture-spec.md
+  Ôöé assets\outputs\step-03-architecture-spec.md
+  Ôöö L551:700 (149 lines read)
+
+ÔùÅ Read step-03-architecture-spec.md
+  Ôöé assets\outputs\step-03-architecture-spec.md
+  Ôöö L701:850 (56 lines read)
+
+ÔùÅ Read step-03-architecture-spec.md
+  Ôöé assets\outputs\step-03-architecture-spec.md
+  Ôöö L401:550 (150 lines read)
+
+ÔùÅ Read step-03-architecture-spec.md
+  Ôöé assets\outputs\step-03-architecture-spec.md
+  Ôöö L1:120 (120 lines read)
+
+Now let me read key sections of the component specs file:
+
+ÔùÅ Read step-04-component-specs.md
+  Ôöé assets\outputs\step-04-component-specs.md
+  Ôöö L121:300 (180 lines read)
+
+ÔùÅ Read step-04-component-specs.md
+  Ôöé assets\outputs\step-04-component-specs.md
+  Ôöö L1:120 (120 lines read)
+
+ÔùÅ Read step-04-component-specs.md
+  Ôöé assets\outputs\step-04-component-specs.md
+  Ôöö L501:700 (200 lines read)
+
+ÔùÅ Read step-04-component-specs.md
+  Ôöé assets\outputs\step-04-component-specs.md
+  Ôöö L301:500 (200 lines read)
+
+I now have comprehensive understanding of the legacy architecture. Let me read the remaining important sections of the component specs to capture any additional details about stored procedures and config:
+
+ÔùÅ Read step-04-component-specs.md
+  Ôöé assets\outputs\step-04-component-specs.md
+  Ôöö L700:900 (201 lines read)
+
+ÔùÅ Read step-04-component-specs.md
+  Ôöé assets\outputs\step-04-component-specs.md
+  Ôöö L900:1100 (201 lines read)
+
+ÔùÅ Read step-04-component-specs.md
+  Ôöé assets\outputs\step-04-component-specs.md
+  Ôöö L1100:1300 (201 lines read)
+
+I now have a thorough understanding of the legacy app. Let me create the modern architecture document.
+
+ÔùÅ Create step-05-modern-architecture.md +1001
+  Ôöö assets\outputs\step-05-modern-architecture.md
+
+The file has been created. Let me verify it's well-formed:
+
+ÔùÅ Verify file line count (shell)
+  Ôöé (Get-Content "C:\code\gbb\labs\appmodlab-spec2cloud-dotnet-framework\assets\
+  Ôöé outputs\step-05-modern-architecture.md" | Measure-Object -Line -Word).Lines
+  Ôöö 2 lines...
+
+Created `assets/outputs/step-05-modern-architecture.md` (835 lines) covering all 7 sections:
+
+1. **Target Platform** ÔÇö .NET 9, Blazor Server, EF Core 9, Azure App Service, Azure SQL with full technology justification and architecture diagram
+2. **Clean Architecture Layers** ÔÇö Domain (entities, enums, fee calculator, status machine), Application (service interfaces, DTOs, validators), Infrastructure (EF Core, Azure services), Presentation (Blazor Server)
+3. **Migration Map** ÔÇö All 6 `.aspx` pages ÔåÆ `.razor` components, master page ÔåÆ `MainLayout.razor`, 2 user controls ÔåÆ shared components, with detailed per-page migration tables for the wizard and search patterns
+4. **Data Access Modernization** ÔÇö ADO.NET ÔåÆ EF Core migration, all 5 stored procedures decomposed into domain/application/infrastructure layers, DataTable ÔåÆ DTO mapping, entity configuration examples
+5. **Project Structure** ÔÇö Full solution tree with 4 projects + 4 test projects + infra + CI/CD, dependency graph, NuGet packages
+6. **Azure Services Integration** ÔÇö 10 Azure services with SKUs, Managed Identity for zero-credential connections, GitHub Actions CI/CD pipeline
+7. **Cross-Cutting Concerns** ÔÇö Entra ID auth with RBAC (3 roles), Serilog + App Insights logging, DI registration strategy, Key Vault configuration, error handling with Blazor ErrorBoundary, security headers, health checks, testing strategy
+
+
+Changes   +1001 -0
+Requests  3 Premium (5m 40s)
+Tokens    Ôåæ 483.3k ÔÇó Ôåô 18.4k ÔÇó 353.2k (cached)
