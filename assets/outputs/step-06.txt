@@ -1,0 +1,69 @@
+ÔùÅ List directory assets\outputs
+  Ôöö 10 files found
+
+ÔùÅ List directory RiverdalePermitSystem.Web
+  Ôöö 17 files found
+
+ÔùÅ Read step-05-modern-architecture.md
+  Ôöé assets\outputs\step-05-modern-architecture.md
+  Ôöö 1 line read
+
+ÔùÅ Read step-05-modern-architecture.md
+  Ôöé assets\outputs\step-05-modern-architecture.md
+  Ôöö L1:120 (120 lines read)
+
+ÔùÅ List directory RiverdalePermitSystem.Web\Pages
+  Ôöö 15 files found
+
+ÔùÅ List directory RiverdalePermitSystem.Web\UserControls
+  Ôöö 6 files found
+
+ÔùÅ List directory RiverdalePermitSystem.Web\App_Code
+  Ôöö 3 files found
+
+ÔùÅ Read step-05-modern-architecture.md
+  Ôöé assets\outputs\step-05-modern-architecture.md
+  Ôöö L300:500 (201 lines read)
+
+ÔùÅ Read step-05-modern-architecture.md
+  Ôöé assets\outputs\step-05-modern-architecture.md
+  Ôöö L120:300 (181 lines read)
+
+ÔùÅ Read step-05-modern-architecture.md
+  Ôöé assets\outputs\step-05-modern-architecture.md
+  Ôöö L700:900 (200 lines read)
+
+ÔùÅ Read step-05-modern-architecture.md
+  Ôöé assets\outputs\step-05-modern-architecture.md
+  Ôöö L500:700 (201 lines read)
+
+ÔùÅ Read step-05-modern-architecture.md
+  Ôöé assets\outputs\step-05-modern-architecture.md
+  Ôöö L899:1000 (102 lines read)
+
+ÔùÅ Read step-05-modern-architecture.md
+  Ôöé assets\outputs\step-05-modern-architecture.md
+  Ôöö L1000:1100 (1 line read)
+
+Now I have full context from the architecture spec. Let me create the comprehensive migration plan document.
+
+ÔùÅ Create step-06-migration-plan.md +648
+  Ôöö assets\outputs\step-06-migration-plan.md
+
+Created `assets/outputs/step-06-migration-plan.md` ÔÇö a comprehensive 7-phase migration plan covering:
+
+- **Phase 0** (1 wk): Dev environment, legacy audit, behavioral baseline
+- **Phase 1** (1.5ÔÇô2 wk): Domain entities, enums, DbContext, Blazor layout shell, domain unit tests
+- **Phase 2** (2ÔÇô3 wk): All 5 stored procedures ÔåÆ EF Core services, 3 static classes replaced
+- **Phase 3** (3ÔÇô4 wk): All 6 `.aspx` pages ÔåÆ `.razor` components (ordered by complexity)
+- **Phase 4** (1ÔÇô1.5 wk): 2 user controls + 5 new shared components (parallel with Phase 3)
+- **Phase 5** (2ÔÇô3 wk): Entra ID auth, Azure Communication Services, Key Vault, App Insights
+- **Phase 6** (2ÔÇô3 wk): Test hardening to 80ÔÇô95% coverage + E2E with Playwright
+- **Phase 7** (1.5ÔÇô2 wk): Bicep IaC, CI/CD pipelines, staged deployment, rollback plan
+
+Each phase includes task breakdowns, risks with mitigations, success criteria checklists, and a dependency graph showing parallel opportunities. Total estimate: 14ÔÇô18 weeks (1 dev) / 8ÔÇô10 weeks (2 devs).
+
+
+Changes   +648 -0
+Requests  3 Premium (4m 58s)
+Tokens    Ôåæ 252.4k ÔÇó Ôåô 14.8k ÔÇó 162.6k (cached)
