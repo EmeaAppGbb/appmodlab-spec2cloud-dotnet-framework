@@ -1,0 +1,147 @@
+@page "/permits/search"
+@inject IPermitService PermitService
+@inject NavigationManager Navigation
+
+<h2>Search Permits</h2>
+
+<div class="search-form">
+    <div class="search-row">
+        <div class="form-group">
+            <label>Permit ID</label>
+            <input type="text" class="form-input" @bind="_criteria.PermitId" />
+        </div>
+        <div class="form-group">
+            <label>Address</label>
+            <input type="text" class="form-input" @bind="_criteria.Address" />
+        </div>
+        <div class="form-group">
+            <label>Permit Type</label>
+            <select class="form-input" @bind="_selectedPermitType">
+                <option value="">All Types</option>
+                @foreach (var pt in Enum.GetValues<PermitType>())
+                {
+                    <option value="@pt">@pt</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Status</label>
+            <select class="form-input" @bind="_selectedStatus">
+                <option value="">All Statuses</option>
+                @foreach (var s in Enum.GetValues<PermitStatus>())
+                {
+                    <option value="@s">@s</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="form-actions">
+        <button class="btn btn-primary" @onclick="SearchPermits">Search</button>
+        <button class="btn btn-secondary" @onclick="ClearSearch">Clear</button>
+    </div>
+</div>
+
+@if (_permits != null)
+{
+    <h3>Search Results</h3>
+    @if (!_permits.Any())
+    {
+        <p>No permits found matching your criteria.</p>
+    }
+    else
+    {
+        <table class="data-grid">
+            <thead>
+                <tr>
+                    <th>Permit ID</th>
+                    <th>Application Date</th>
+                    <th>Property Address</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Estimated Cost</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var permit in _permits)
+                {
+                    <tr>
+                        <td>@permit.PermitId</td>
+                        <td>@permit.ApplicationDate.ToString("MM/dd/yyyy")</td>
+                        <td>@permit.PropertyAddress</td>
+                        <td>@permit.PermitType</td>
+                        <td><StatusBadge Status="@permit.Status.ToString()" /></td>
+                        <td>@permit.EstimatedCost.ToString("C")</td>
+                        <td>
+                            <button class="btn btn-sm" @onclick="() => ViewDetails(permit.PermitId)">View Details</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@if (_selectedPermit != null)
+{
+    <div class="permit-details-panel">
+        <h3>Permit Details</h3>
+        <PermitHeader PermitId="@_selectedPermit.PermitId" PropertyAddress="@_selectedPermit.PropertyAddress" Status="@_selectedPermit.Status.ToString()" />
+        <div class="detail-grid">
+            <p><strong>Application Date:</strong> @_selectedPermit.ApplicationDate.ToString("MM/dd/yyyy")</p>
+            <p><strong>Parcel Number:</strong> @_selectedPermit.ParcelNumber</p>
+            <p><strong>Permit Type:</strong> @_selectedPermit.PermitType</p>
+            <p><strong>Estimated Cost:</strong> @_selectedPermit.EstimatedCost.ToString("C")</p>
+            <p><strong>Applicant:</strong> @_selectedPermit.ApplicantName</p>
+            <p><strong>Description:</strong> @_selectedPermit.ProjectDescription</p>
+        </div>
+        <button class="btn btn-secondary" @onclick="CloseDetails">Close</button>
+    </div>
+}
+
+@code {
+    [SupplyParameterFromQuery] public string? PermitId { get; set; }
+
+    private PermitSearchCriteria _criteria = new();
+    private IReadOnlyList<PermitSummaryDto>? _permits;
+    private PermitDetailDto? _selectedPermit;
+    private string _selectedPermitType = "";
+    private string _selectedStatus = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(PermitId))
+        {
+            _criteria.PermitId = PermitId;
+            await SearchPermits();
+        }
+    }
+
+    private async Task SearchPermits()
+    {
+        _criteria.PermitType = string.IsNullOrEmpty(_selectedPermitType) ? null : Enum.Parse<PermitType>(_selectedPermitType);
+        _criteria.Status = string.IsNullOrEmpty(_selectedStatus) ? null : Enum.Parse<PermitStatus>(_selectedStatus);
+        _permits = await PermitService.SearchPermitsAsync(_criteria);
+        _selectedPermit = null;
+    }
+
+    private async Task ViewDetails(string permitId)
+    {
+        _selectedPermit = await PermitService.GetPermitByIdAsync(permitId);
+    }
+
+    private void CloseDetails()
+    {
+        _selectedPermit = null;
+    }
+
+    private async Task ClearSearch()
+    {
+        _criteria = new PermitSearchCriteria();
+        _selectedPermitType = "";
+        _selectedStatus = "";
+        _permits = null;
+        _selectedPermit = null;
+        await Task.CompletedTask;
+    }
+}

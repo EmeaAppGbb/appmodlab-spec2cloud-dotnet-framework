@@ -1,0 +1,68 @@
+@page "/"
+@inject IPermitService PermitService
+
+<h2>Welcome to the Riverdale Building Permit System</h2>
+
+<div class="page-actions">
+    <button class="btn btn-primary" @onclick="LoadRecentPermits">Refresh</button>
+    <span class="last-update">Last updated: @_lastUpdate</span>
+</div>
+
+<h3>Recent Permit Applications</h3>
+
+@if (_permits == null)
+{
+    <LoadingSpinner />
+}
+else if (!_permits.Any())
+{
+    <p>No recent permits found.</p>
+}
+else
+{
+    <table class="data-grid">
+        <thead>
+            <tr>
+                <th>Permit ID</th>
+                <th>Application Date</th>
+                <th>Property Address</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Estimated Cost</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var permit in _permits)
+            {
+                <tr>
+                    <td>@permit.PermitId</td>
+                    <td>@permit.ApplicationDate.ToString("MM/dd/yyyy")</td>
+                    <td>@permit.PropertyAddress</td>
+                    <td>@permit.PermitType</td>
+                    <td><StatusBadge Status="@permit.Status.ToString()" /></td>
+                    <td>@permit.EstimatedCost.ToString("C")</td>
+                    <td>
+                        <a href="permits/search?permitId=@permit.PermitId" class="btn btn-sm">View Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IReadOnlyList<PermitSummaryDto>? _permits;
+    private string _lastUpdate = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRecentPermits();
+    }
+
+    private async Task LoadRecentPermits()
+    {
+        _permits = await PermitService.GetRecentPermitsAsync(10);
+        _lastUpdate = DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt");
+    }
+}

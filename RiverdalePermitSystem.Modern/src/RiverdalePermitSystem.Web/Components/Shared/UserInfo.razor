@@ -1,0 +1,15 @@
+@inject ICurrentUserService CurrentUser
+
+<span>Welcome, @_userName | Role: @_userRole</span>
+
+@code {
+    private string _userName = "";
+    private string _userRole = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _userName = await CurrentUser.GetCurrentUserNameAsync();
+        var roles = await CurrentUser.GetCurrentUserRolesAsync();
+        _userRole = string.Join(", ", roles);
+    }
+}

@@ -1,0 +1,221 @@
+@page "/permits/apply"
+@inject IPermitService PermitService
+@inject IEmailNotificationService EmailService
+@inject NavigationManager Navigation
+
+<h2>Apply for a Building Permit</h2>
+
+<div class="wizard-steps">
+    <div class="wizard-step @(CurrentStep == 1 ? "active" : CurrentStep > 1 ? "completed" : "")">1. Property Info</div>
+    <div class="wizard-step @(CurrentStep == 2 ? "active" : CurrentStep > 2 ? "completed" : "")">2. Applicant Info</div>
+    <div class="wizard-step @(CurrentStep == 3 ? "active" : CurrentStep > 3 ? "completed" : "")">3. Permit Details</div>
+    <div class="wizard-step @(CurrentStep == 4 ? "active" : "")">4. Review & Submit</div>
+</div>
+
+@if (_submitted)
+{
+    <div class="success-message">
+        <h3>Application Submitted Successfully!</h3>
+        <p><strong>Permit ID:</strong> @_submittedPermitId</p>
+        <p>A confirmation email has been sent to <strong>@_model.Email</strong>.</p>
+        <p>You can track your permit status using the permit search page.</p>
+        <a href="permits/search?permitId=@_submittedPermitId" class="btn btn-primary">View Permit</a>
+    </div>
+}
+else
+{
+    <EditForm Model="_model" OnValidSubmit="HandleSubmit">
+        <DataAnnotationsValidator />
+
+        @if (CurrentStep == 1)
+        {
+            <div class="form-section">
+                <h3>Step 1: Property Information</h3>
+                <div class="form-group">
+                    <label>Property Address *</label>
+                    <AddressLookup @bind-Address="_model.PropertyAddress" />
+                    <ValidationMessage For="() => _model.PropertyAddress" />
+                </div>
+                <div class="form-group">
+                    <label>Parcel Number *</label>
+                    <InputText @bind-Value="_model.ParcelNumber" class="form-input" />
+                    <ValidationMessage For="() => _model.ParcelNumber" />
+                </div>
+                <div class="form-group">
+                    <label>Zoning District</label>
+                    <InputSelect @bind-Value="_model.ZoningDistrict" class="form-input">
+                        <option value="">-- Select --</option>
+                        @foreach (var z in Enum.GetValues<ZoningDistrict>())
+                        {
+                            <option value="@z">@z</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" @onclick="NextStep">Next →</button>
+                </div>
+            </div>
+        }
+
+        @if (CurrentStep == 2)
+        {
+            <div class="form-section">
+                <h3>Step 2: Applicant Information</h3>
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <InputText @bind-Value="_model.ApplicantName" class="form-input" />
+                    <ValidationMessage For="() => _model.ApplicantName" />
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <InputText @bind-Value="_model.Email" class="form-input" type="email" />
+                    <ValidationMessage For="() => _model.Email" />
+                </div>
+                <div class="form-group">
+                    <label>Phone *</label>
+                    <InputText @bind-Value="_model.Phone" class="form-input" />
+                    <ValidationMessage For="() => _model.Phone" />
+                </div>
+                <div class="form-group">
+                    <label>Company</label>
+                    <InputText @bind-Value="_model.Company" class="form-input" />
+                </div>
+                <div class="form-group">
+                    <label>License Number</label>
+                    <InputText @bind-Value="_model.LicenseNumber" class="form-input" />
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" @onclick="PreviousStep">← Previous</button>
+                    <button type="button" class="btn btn-primary" @onclick="NextStep">Next →</button>
+                </div>
+            </div>
+        }
+
+        @if (CurrentStep == 3)
+        {
+            <div class="form-section">
+                <h3>Step 3: Permit Details</h3>
+                <div class="form-group">
+                    <label>Permit Type *</label>
+                    <InputSelect @bind-Value="_model.PermitType" class="form-input">
+                        @foreach (var pt in Enum.GetValues<PermitType>())
+                        {
+                            <option value="@pt">@pt</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => _model.PermitType" />
+                </div>
+                <div class="form-group">
+                    <label>Project Description *</label>
+                    <InputTextArea @bind-Value="_model.ProjectDescription" class="form-input" rows="4" />
+                    <ValidationMessage For="() => _model.ProjectDescription" />
+                </div>
+                <div class="form-group">
+                    <label>Estimated Cost *</label>
+                    <InputNumber @bind-Value="_model.EstimatedCost" class="form-input" />
+                    <ValidationMessage For="() => _model.EstimatedCost" />
+                </div>
+                <div class="form-group">
+                    <label>Square Footage</label>
+                    <InputNumber @bind-Value="_model.SquareFootage" class="form-input" />
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-secondary" @onclick="CalculateFee">Calculate Fee</button>
+                    <span class="estimated-fee">Estimated Fee: @_estimatedFee.ToString("C")</span>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" @onclick="PreviousStep">← Previous</button>
+                    <button type="button" class="btn btn-primary" @onclick="NextStep">Next →</button>
+                </div>
+            </div>
+        }
+
+        @if (CurrentStep == 4)
+        {
+            <div class="form-section">
+                <h3>Step 4: Review & Submit</h3>
+                <div class="review-summary">
+                    <h4>Property Information</h4>
+                    <p><strong>Address:</strong> @_model.PropertyAddress</p>
+                    <p><strong>Parcel Number:</strong> @_model.ParcelNumber</p>
+                    <p><strong>Zoning:</strong> @(_model.ZoningDistrict?.ToString() ?? "N/A")</p>
+
+                    <h4>Applicant Information</h4>
+                    <p><strong>Name:</strong> @_model.ApplicantName</p>
+                    <p><strong>Email:</strong> @_model.Email</p>
+                    <p><strong>Phone:</strong> @_model.Phone</p>
+
+                    <h4>Permit Details</h4>
+                    <p><strong>Type:</strong> @_model.PermitType</p>
+                    <p><strong>Description:</strong> @_model.ProjectDescription</p>
+                    <p><strong>Estimated Cost:</strong> @_model.EstimatedCost.ToString("C")</p>
+                    <p><strong>Estimated Fee:</strong> @_estimatedFee.ToString("C")</p>
+                </div>
+
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="alert alert-danger">@_errorMessage</div>
+                }
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" @onclick="PreviousStep">← Previous</button>
+                    <button type="submit" class="btn btn-primary" disabled="@_isSubmitting">
+                        @(_isSubmitting ? "Submitting..." : "Submit Application")
+                    </button>
+                </div>
+            </div>
+        }
+    </EditForm>
+}
+
+@code {
+    private PermitApplicationDto _model = new();
+    private int CurrentStep { get; set; } = 1;
+    private decimal _estimatedFee;
+    private bool _submitted;
+    private bool _isSubmitting;
+    private string _submittedPermitId = "";
+    private string? _errorMessage;
+
+    private void NextStep()
+    {
+        if (CurrentStep < 4) CurrentStep++;
+    }
+
+    private void PreviousStep()
+    {
+        if (CurrentStep > 1) CurrentStep--;
+    }
+
+    private async Task CalculateFee()
+    {
+        if (_model.EstimatedCost > 0)
+        {
+            _estimatedFee = await PermitService.CalculatePermitFeeAsync(
+                _model.PermitType, _model.EstimatedCost, _model.SquareFootage, _model.ZoningDistrict);
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            _isSubmitting = true;
+            _errorMessage = null;
+
+            _submittedPermitId = await PermitService.SubmitPermitApplicationAsync(_model);
+
+            await EmailService.SendPermitConfirmationAsync(_model.Email, _model.ApplicantName, _submittedPermitId);
+
+            _submitted = true;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error submitting application: {ex.Message}";
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+}

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>RiverdalePermitSystem.Web</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RiverdalePermitSystem.Application\RiverdalePermitSystem.Application.csproj" />
+    <ProjectReference Include="..\RiverdalePermitSystem.Infrastructure\RiverdalePermitSystem.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

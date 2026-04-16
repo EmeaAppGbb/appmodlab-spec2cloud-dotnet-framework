@@ -1,0 +1,17 @@
+<span class="status-badge @GetStatusClass()">@Status</span>
+
+@code {
+    [Parameter] public string Status { get; set; } = "";
+
+    private string GetStatusClass() => Status switch
+    {
+        "Submitted" => "status-submitted",
+        "UnderReview" => "status-under-review",
+        "Approved" => "status-approved",
+        "Issued" => "status-issued",
+        "CertificateOfOccupancyIssued" => "status-completed",
+        "Expired" => "status-expired",
+        _ when Status.Contains("Failed") || Status.Contains("Rejected") => "status-rejected",
+        _ => "status-default"
+    };
+}

@@ -1,0 +1,18 @@
+<div class="permit-header">
+    <div class="permit-header-item">
+        <strong>Permit ID:</strong> @PermitId
+    </div>
+    <div class="permit-header-item">
+        <strong>Address:</strong> @PropertyAddress
+    </div>
+    <div class="permit-header-item">
+        <strong>Status:</strong>
+        <StatusBadge Status="@Status" />
+    </div>
+</div>
+
+@code {
+    [Parameter] public string PermitId { get; set; } = "";
+    [Parameter] public string PropertyAddress { get; set; } = "";
+    [Parameter] public string Status { get; set; } = "";
+}

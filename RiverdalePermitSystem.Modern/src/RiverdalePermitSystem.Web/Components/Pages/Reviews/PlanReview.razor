@@ -1,0 +1,181 @@
+@page "/reviews"
+@page "/reviews/{PermitIdParam}"
+@inject IPermitService PermitService
+@inject IPlanReviewService PlanReviewService
+@inject ICurrentUserService CurrentUser
+
+<h2>Plan Review</h2>
+
+<div class="form-section">
+    <div class="form-row">
+        <div class="form-group">
+            <label>Permit ID</label>
+            <input type="text" class="form-input" @bind="_permitId" />
+        </div>
+        <button class="btn btn-primary" @onclick="LoadPermit">Load Permit</button>
+    </div>
+</div>
+
+@if (_permit != null)
+{
+    <PermitHeader PermitId="@_permit.PermitId" PropertyAddress="@_permit.PropertyAddress" Status="@_permit.Status.ToString()" />
+
+    <div class="form-section">
+        <h3>Review History</h3>
+        @if (_reviewHistory.Any())
+        {
+            <table class="data-grid">
+                <thead>
+                    <tr>
+                        <th>Review Date</th>
+                        <th>Type</th>
+                        <th>Reviewer</th>
+                        <th>Status</th>
+                        <th>Comments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var review in _reviewHistory)
+                    {
+                        <tr>
+                            <td>@review.ReviewDate.ToString("MM/dd/yyyy")</td>
+                            <td>@review.ReviewType</td>
+                            <td>@review.ReviewerName</td>
+                            <td><StatusBadge Status="@review.Status.ToString()" /></td>
+                            <td>@review.Comments</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No reviews yet.</p>
+        }
+    </div>
+
+    <div class="form-section">
+        <h3>Submit New Review</h3>
+        <p>Reviewer: <strong>@_reviewerName</strong></p>
+        <EditForm Model="_reviewModel" OnValidSubmit="SubmitReview">
+            <DataAnnotationsValidator />
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Review Type *</label>
+                    <InputSelect @bind-Value="_reviewModel.ReviewType" class="form-input">
+                        @foreach (var rt in Enum.GetValues<ReviewType>())
+                        {
+                            <option value="@rt">@rt</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="form-group">
+                    <label>Status *</label>
+                    <InputSelect @bind-Value="_reviewModel.Status" class="form-input">
+                        @foreach (var rs in Enum.GetValues<ReviewStatus>())
+                        {
+                            <option value="@rs">@rs</option>
+                        }
+                    </InputSelect>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Comments</label>
+                <InputTextArea @bind-Value="_reviewModel.Comments" class="form-input" rows="3" />
+            </div>
+            <div class="form-group">
+                <label>Deficiencies</label>
+                @foreach (var deficiency in _deficiencyOptions)
+                {
+                    <label class="checkbox-label">
+                        <input type="checkbox" checked="@_reviewModel.Deficiencies.Contains(deficiency)"
+                               @onchange="e => ToggleDeficiency(deficiency, (bool)(e.Value ?? false))" />
+                        @deficiency
+                    </label>
+                }
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Review</button>
+        </EditForm>
+
+        @if (!string.IsNullOrEmpty(_message))
+        {
+            <div class="@(_isError ? "alert alert-danger" : "success-message")">@_message</div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string? PermitIdParam { get; set; }
+
+    private string _permitId = "";
+    private string _reviewerName = "";
+    private PermitDetailDto? _permit;
+    private IReadOnlyList<PlanReviewHistoryDto> _reviewHistory = Array.Empty<PlanReviewHistoryDto>();
+    private PlanReviewSubmissionDto _reviewModel = new();
+    private string? _message;
+    private bool _isError;
+
+    private readonly List<string> _deficiencyOptions = new()
+    {
+        "Structural integrity concerns",
+        "Electrical code violations",
+        "Plumbing code violations",
+        "Fire safety non-compliance",
+        "Zoning violations",
+        "Incomplete documentation",
+        "Environmental concerns"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _reviewerName = await CurrentUser.GetCurrentUserNameAsync();
+
+        if (!string.IsNullOrEmpty(PermitIdParam))
+        {
+            _permitId = PermitIdParam;
+            await LoadPermit();
+        }
+    }
+
+    private async Task LoadPermit()
+    {
+        if (string.IsNullOrWhiteSpace(_permitId)) return;
+
+        _permit = await PermitService.GetPermitByIdAsync(_permitId);
+        if (_permit != null)
+        {
+            _reviewModel.PermitId = _permitId;
+            _reviewHistory = await PlanReviewService.GetPlanReviewHistoryAsync(_permitId);
+        }
+        else
+        {
+            _message = "Permit not found.";
+            _isError = true;
+        }
+    }
+
+    private void ToggleDeficiency(string deficiency, bool isChecked)
+    {
+        if (isChecked && !_reviewModel.Deficiencies.Contains(deficiency))
+            _reviewModel.Deficiencies.Add(deficiency);
+        else if (!isChecked)
+            _reviewModel.Deficiencies.Remove(deficiency);
+    }
+
+    private async Task SubmitReview()
+    {
+        try
+        {
+            var reviewId = await PlanReviewService.SubmitPlanReviewAsync(_reviewModel);
+            _message = $"Review {reviewId} submitted successfully!";
+            _isError = false;
+            _reviewModel = new PlanReviewSubmissionDto { PermitId = _permitId };
+            _reviewHistory = await PlanReviewService.GetPlanReviewHistoryAsync(_permitId);
+        }
+        catch (Exception ex)
+        {
+            _message = $"Error submitting review: {ex.Message}";
+            _isError = true;
+        }
+    }
+}

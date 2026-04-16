@@ -1,0 +1,45 @@
+<div class="address-lookup">
+    <div class="input-group">
+        <input type="text" class="form-input" @bind="Address" @bind:event="oninput"
+               placeholder="Enter property address..." />
+        <button type="button" class="btn btn-secondary" @onclick="LookupAddress">Lookup</button>
+    </div>
+
+    @if (_showSuggestions && _suggestions.Any())
+    {
+        <ul class="suggestions-list">
+            @foreach (var suggestion in _suggestions)
+            {
+                <li @onclick="() => SelectAddress(suggestion)">@suggestion</li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    [Parameter] public string Address { get; set; } = "";
+    [Parameter] public EventCallback<string> AddressChanged { get; set; }
+
+    private bool _showSuggestions;
+    private List<string> _suggestions = new();
+
+    private void LookupAddress()
+    {
+        _suggestions = new List<string>
+        {
+            "123 Main Street, Riverdale",
+            "456 Oak Avenue, Riverdale",
+            "789 Elm Drive, Riverdale",
+            "321 Maple Lane, Riverdale",
+            "654 Pine Road, Riverdale"
+        };
+        _showSuggestions = true;
+    }
+
+    private async Task SelectAddress(string address)
+    {
+        Address = address;
+        _showSuggestions = false;
+        await AddressChanged.InvokeAsync(address);
+    }
+}

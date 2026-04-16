@@ -1,0 +1,156 @@
+@page "/inspections"
+@inject IInspectionService InspectionService
+
+<h2>Inspection Schedule</h2>
+
+<div class="form-section">
+    <h3>Schedule New Inspection</h3>
+    <EditForm Model="_scheduleModel" OnValidSubmit="ScheduleInspection">
+        <DataAnnotationsValidator />
+        <div class="form-row">
+            <div class="form-group">
+                <label>Permit ID *</label>
+                <InputText @bind-Value="_scheduleModel.PermitId" class="form-input" />
+                <ValidationMessage For="() => _scheduleModel.PermitId" />
+            </div>
+            <div class="form-group">
+                <label>Inspection Type *</label>
+                <InputSelect @bind-Value="_scheduleModel.InspectionType" class="form-input">
+                    @foreach (var t in Enum.GetValues<InspectionType>())
+                    {
+                        <option value="@t">@t</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="form-group">
+                <label>Requested Date *</label>
+                <InputDate @bind-Value="_scheduleModel.RequestedDate" class="form-input" />
+                <ValidationMessage For="() => _scheduleModel.RequestedDate" />
+            </div>
+            <div class="form-group">
+                <label>Notes</label>
+                <InputTextArea @bind-Value="_scheduleModel.Notes" class="form-input" rows="2" />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Schedule Inspection</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(_message))
+    {
+        <div class="@(_isError ? "alert alert-danger" : "success-message")">@_message</div>
+    }
+</div>
+
+<div class="form-section">
+    <h3>Upcoming Inspections</h3>
+    <button class="btn btn-secondary" @onclick="LoadInspections">Refresh</button>
+
+    @if (_inspections == null)
+    {
+        <LoadingSpinner />
+    }
+    else if (!_inspections.Any())
+    {
+        <p>No upcoming inspections.</p>
+    }
+    else
+    {
+        <table class="data-grid">
+            <thead>
+                <tr>
+                    <th>Inspection ID</th>
+                    <th>Permit ID</th>
+                    <th>Type</th>
+                    <th>Scheduled Date</th>
+                    <th>Status</th>
+                    <th>Inspector</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var insp in _inspections)
+                {
+                    <tr>
+                        <td>@insp.InspectionId</td>
+                        <td>@insp.PermitId</td>
+                        <td>@insp.InspectionType</td>
+                        <td>@insp.ScheduledDate.ToString("MM/dd/yyyy")</td>
+                        <td><StatusBadge Status="@insp.Status.ToString()" /></td>
+                        <td>@insp.InspectorName</td>
+                        <td>
+                            <button class="btn btn-sm btn-success" @onclick="() => CompleteInspection(insp.InspectionId, InspectionResult.Passed)">Pass</button>
+                            <button class="btn btn-sm btn-danger" @onclick="() => CompleteInspection(insp.InspectionId, InspectionResult.Failed)">Fail</button>
+                            <button class="btn btn-sm btn-secondary" @onclick="() => CancelInspection(insp.InspectionId)">Cancel</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private InspectionScheduleDto _scheduleModel = new() { RequestedDate = DateTime.Today.AddDays(1) };
+    private IReadOnlyList<InspectionSummaryDto>? _inspections;
+    private string? _message;
+    private bool _isError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadInspections();
+    }
+
+    private async Task LoadInspections()
+    {
+        _inspections = await InspectionService.GetUpcomingInspectionsAsync();
+    }
+
+    private async Task ScheduleInspection()
+    {
+        try
+        {
+            var id = await InspectionService.ScheduleInspectionAsync(_scheduleModel);
+            _message = $"Inspection {id} scheduled successfully!";
+            _isError = false;
+            _scheduleModel = new InspectionScheduleDto { RequestedDate = DateTime.Today.AddDays(1) };
+            await LoadInspections();
+        }
+        catch (Exception ex)
+        {
+            _message = $"Error scheduling inspection: {ex.Message}";
+            _isError = true;
+        }
+    }
+
+    private async Task CompleteInspection(string inspectionId, InspectionResult result)
+    {
+        try
+        {
+            await InspectionService.CompleteInspectionAsync(inspectionId, result, null);
+            _message = $"Inspection {inspectionId} marked as {result}.";
+            _isError = false;
+            await LoadInspections();
+        }
+        catch (Exception ex)
+        {
+            _message = $"Error: {ex.Message}";
+            _isError = true;
+        }
+    }
+
+    private async Task CancelInspection(string inspectionId)
+    {
+        try
+        {
+            await InspectionService.CancelInspectionAsync(inspectionId);
+            _message = $"Inspection {inspectionId} cancelled.";
+            _isError = false;
+            await LoadInspections();
+        }
+        catch (Exception ex)
+        {
+            _message = $"Error: {ex.Message}";
+            _isError = true;
+        }
+    }
+}

@@ -1,0 +1,113 @@
+@page "/dashboard"
+@inject IPermitService PermitService
+
+<h2>Administrative Dashboard</h2>
+
+<div class="page-actions">
+    <button class="btn btn-primary" @onclick="LoadDashboardData">Refresh</button>
+    <span class="last-update">Last updated: @_lastUpdate</span>
+</div>
+
+@if (_stats == null)
+{
+    <LoadingSpinner />
+}
+else
+{
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>@_stats.TotalPermits</h3>
+            <p>Total Permits</p>
+        </div>
+        <div class="stat-card">
+            <h3>@_stats.PendingReview</h3>
+            <p>Pending Review</p>
+        </div>
+        <div class="stat-card">
+            <h3>@_stats.InspectionsToday</h3>
+            <p>Inspections Today</p>
+        </div>
+        <div class="stat-card">
+            <h3>@_stats.MonthlyRevenue.ToString("C")</h3>
+            <p>Monthly Revenue</p>
+        </div>
+    </div>
+
+    <div class="dashboard-panels">
+        <div class="dashboard-panel">
+            <h3>Permits by Status</h3>
+            @if (_statusSummary != null)
+            {
+                <table class="data-grid">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                            <th>Total Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in _statusSummary)
+                        {
+                            <tr>
+                                <td><StatusBadge Status="@item.Status.ToString()" /></td>
+                                <td>@item.Count</td>
+                                <td>@item.TotalValue.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+
+        <div class="dashboard-panel">
+            <h3>Recent Activity</h3>
+            @if (_activity != null)
+            {
+                <table class="data-grid">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Activity</th>
+                            <th>Permit</th>
+                            <th>Description</th>
+                            <th>User</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in _activity)
+                        {
+                            <tr>
+                                <td>@item.Timestamp.ToString("MM/dd HH:mm")</td>
+                                <td>@item.ActivityType</td>
+                                <td>@item.PermitId</td>
+                                <td>@item.Description</td>
+                                <td>@item.UserName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private DashboardStatisticsDto? _stats;
+    private IReadOnlyList<StatusSummaryDto>? _statusSummary;
+    private IReadOnlyList<ActivityLogDto>? _activity;
+    private string _lastUpdate = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboardData();
+    }
+
+    private async Task LoadDashboardData()
+    {
+        _stats = await PermitService.GetDashboardStatisticsAsync();
+        _activity = await PermitService.GetRecentActivityAsync(20);
+        _statusSummary = await PermitService.GetPermitsByStatusAsync();
+        _lastUpdate = DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss tt");
+    }
+}
