@@ -1,0 +1,93 @@
+ÔùÅ Read README.md
+  Ôöö 1 line read
+
+ÔùÅ Read README.md
+  Ôöö L1:50 (49 lines read)
+
+ÔùÅ Count lines in README.md (shell)
+  Ôöé (Get-Content
+  Ôöé "C:\code\gbb\labs\appmodlab-spec2cloud-dotnet-framework\README.md").Count
+  Ôöö 2 lines...
+
+ÔùÅ Read README.md
+  Ôöö L450:471 (22 lines read)
+
+ÔùÅ Check for solution branches (shell)
+  Ôöé git --no-pager branch -a 2>$null | Select-String "solution"
+  Ôöö 3 lines...
+
+ÔùÅ Check for step tags (shell)
+  Ôöé git --no-pager tag -l "step*" 2>$null | head -20
+  Ôöö 7 lines...
+
+ÔùÅ Check solution-final commits (shell)
+  Ôöé git --no-pager log --oneline -20 solution-final 2>$null
+  Ôöö 17 lines...
+
+ÔùÅ Check for step tags (shell)
+  Ôöé git --no-pager tag -l "step*" 2>$null; git --no-pager tag -l "*step*"
+  Ôöé 2>$null
+  Ôöö 17 lines...
+
+Now let me check what output files exist on the solution-final branch to document them accurately.
+
+ÔùÅ Files added in step 6 (shell)
+  Ôöé git --no-pager diff --name-only
+  Ôöé step-05-modern-architecture..step-06-migration-plan 2>$null
+  Ôöö 3 lines...
+
+ÔùÅ Files added in step 1 (shell)
+  Ôöé git --no-pager diff --name-only
+  Ôöé step-01-explore-legacy-app~1..step-01-explore-legacy-app 2>$null
+  Ôöö 3 lines...
+
+ÔùÅ Files added in step 7 (shell)
+  Ôöé git --no-pager diff --name-only
+  Ôöé step-06-migration-plan..step-07-scaffold-modern 2>$null
+  Ôöö 81 lines...
+
+ÔùÅ Files added in step 2 (shell)
+  Ôöé git --no-pager diff --name-only
+  Ôöé step-01-explore-legacy-app..step-02-spec2cloud-analysis 2>$null
+  Ôöö 3 lines...
+
+ÔùÅ Files added in step 4 (shell)
+  Ôöé git --no-pager diff --name-only
+  Ôöé step-03-architecture-spec..step-04-component-specs 2>$null
+  Ôöö 3 lines...
+
+ÔùÅ Files added in step 5 (shell)
+  Ôöé git --no-pager diff --name-only
+  Ôöé step-04-component-specs..step-05-modern-architecture 2>$null
+  Ôöö 3 lines...
+
+ÔùÅ Files added in step 8 (shell)
+  Ôöé git --no-pager diff --name-only step-07-scaffold-modern..step-08-validate
+  Ôöé 2>$null
+  Ôöö 3 lines...
+
+ÔùÅ Files added in step 3 (shell)
+  Ôöé git --no-pager diff --name-only
+  Ôöé step-02-spec2cloud-analysis..step-03-architecture-spec 2>$null
+  Ôöö 3 lines...
+
+Now I have all the information needed. Let me also check step commit messages for titles:
+
+ÔùÅ Get step commit titles (shell)
+  Ôöé git --no-pager log --oneline --reverse
+  Ôöé step-01-explore-legacy-app..step-08-validate 2>$null
+  Ôöö 9 lines...
+
+ÔùÅ Edit README.md +50
+
+Let me verify the edit looks correct at the end of the file:
+
+ÔùÅ Read README.md
+  Ôöö L469:515 (46 lines read)
+
+The section has been appended successfully. It documents all 8 steps with their tags, titles, output files, file conventions, and useful git commands for comparing steps ÔÇö all derived from the actual repository data.
+
+
+Changes   +50 -0
+Requests  3 Premium (1m 23s)
+Tokens    Ôåæ 269.3k ÔÇó Ôåô 2.8k ÔÇó 237.4k (cached)
