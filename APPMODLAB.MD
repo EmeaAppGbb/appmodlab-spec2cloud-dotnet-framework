@@ -11,7 +11,7 @@ modernizationTools: ["Spec2Cloud"]
 agenticTools: []
 tags: ["dotnet-framework", "web-forms", "blazor", "modernization", "specifications"]
 extensions: ["github.copilot"]
-thumbnail: ""
+thumbnail: "https://raw.githubusercontent.com/EmeaAppGbb/appmodlab-spec2cloud-dotnet-framework/main/assets/thumbnail-gpt-image.png"
 video: ""
 version: "1.0.0"
 ---
